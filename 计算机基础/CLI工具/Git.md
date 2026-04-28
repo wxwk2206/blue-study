@@ -1,4 +1,4 @@
-## <font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">一、初始化，配置，克隆</font>
+## 一、初始化，配置，克隆
 ```bash
 # 初始化本地仓库（在项目文件夹执行）
 git init
@@ -55,7 +55,7 @@ git log --graph --oneline --all
 <!-- 这是一张图片，ocr 内容为： -->
 ![](https://cdn.nlark.com/yuque/0/2026/png/62702379/1776826056043-5e397b5a-67a5-4a6c-a3da-b4d449264107.png)
 
-## <font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">三、远程仓库操作（GitHub）</font>
+## 三、远程仓库操作（GitHub）
 ```bash
 # 关联远程仓库
 git remote add origin 仓库地址
@@ -76,7 +76,7 @@ git push
 git push -u origin 分支名
 ```
 
-## <font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">四、分支操作</font>
+## 四、分支操作
 ```bash
 # 查看所有本地分支
 git branch
@@ -103,7 +103,7 @@ git merge 分支名
 git branch -d 分支名
 ```
 
-## <font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">五、撤销 / 回退（非常实用）</font>
+## 五、撤销 / 回退（非常实用）
 ```bash
 # 撤销工作区修改（恢复到最近一次提交）
 git checkout 提交id 文件名
@@ -122,7 +122,7 @@ git reset --soft HEAD^
 git reset --hard HEAD^
 ```
 
-## <font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">六、储藏（临时保存未提交代码）</font>
+## 六、储藏（临时保存未提交代码）
 ```bash
 # 储藏当前修改
 git stash
@@ -137,7 +137,7 @@ git stash pop
 git stash clear
 ```
 
-## <font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">七、标签（版本发布）</font>
+## 七、标签（版本发布）
 ```bash
 # 创建标签
 git tag v1.0
