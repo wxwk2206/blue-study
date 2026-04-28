@@ -70,7 +70,7 @@ git fetch
 git pull
 
 # 推送到远程仓库
-git push
+git push origin main
 
 # 第一次推送分支（绑定上游）
 git push -u origin 分支名
