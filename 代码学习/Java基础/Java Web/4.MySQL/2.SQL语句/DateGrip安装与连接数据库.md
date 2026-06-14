@@ -36,3 +36,6 @@
 
 然后点击 OK ， 就已经连接上了MySQL数据库了。
 
+> [!abstract] 本篇关联
+> - [[代码学习/Java基础/Java Web/4.MySQL/2.SQL语句/3.DQL（查询）]]
+> - [[代码学习/Java基础/Java Web/4.MySQL/3.JDBC]]
