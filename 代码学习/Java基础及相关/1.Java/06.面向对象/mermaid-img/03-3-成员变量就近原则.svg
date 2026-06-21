@@ -1,0 +1,37 @@
+<svg viewBox="0 0 680 180" xmlns="http://www.w3.org/2000/svg" role="img">
+  <title>成员变量访问就近原则</title>
+  <desc>方法内局部变量 → 本类成员变量 → 父类成员变量 → 报错</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <text x="340" y="30" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="500" fill="#2C2C2A">成员变量访问：就近原则</text>
+
+  <g>
+    <rect x="20" y="80" width="130" height="44" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+    <text x="85" y="102" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" font-weight="500" fill="#412402">方法内局部变量</text>
+  </g>
+  <path d="M150 102L168 102" fill="none" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="159" y="92" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#888780">没找到</text>
+
+  <g>
+    <rect x="170" y="80" width="160" height="44" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+    <text x="250" y="102" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" font-weight="500" fill="#042C53">本类成员变量 this</text>
+  </g>
+  <path d="M330 102L348 102" fill="none" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="339" y="92" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#888780">没找到</text>
+
+  <g>
+    <rect x="350" y="80" width="160" height="44" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+    <text x="430" y="102" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" font-weight="500" fill="#26215C">父类成员变量 super</text>
+  </g>
+  <path d="M510 102L528 102" fill="none" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="519" y="92" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#888780">没找到</text>
+
+  <g>
+    <rect x="530" y="80" width="130" height="44" rx="8" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.5"/>
+    <text x="595" y="102" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="13" font-weight="500" fill="#501313">报错！</text>
+  </g>
+</svg>

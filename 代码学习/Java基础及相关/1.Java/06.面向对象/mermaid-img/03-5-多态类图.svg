@@ -1,0 +1,37 @@
+<svg viewBox="0 0 680 360" xmlns="http://www.w3.org/2000/svg" role="img">
+  <title>多态类图</title>
+  <desc>Person 父类有 sayHello()，Student 和 Teacher 重写 sayHello() 表现出不同行为</desc>
+  <defs>
+    <marker id="inherit" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M1 1L11 6L1 11Z" fill="#FFFFFF" stroke="#5F5E5A" stroke-width="1"/>
+    </marker>
+  </defs>
+
+  <text x="340" y="30" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="500" fill="#2C2C2A">多态：同一个 sayHello()，不同表现</text>
+
+  <g>
+    <rect x="270" y="50" width="140" height="70" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+    <text x="340" y="70" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="500" fill="#042C53">Person</text>
+    <line x1="270" y1="82" x2="410" y2="82" stroke="#185FA5" stroke-width="0.5"/>
+    <text x="282" y="102" font-family="monospace" font-size="12" fill="#042C53">+ sayHello()</text>
+  </g>
+
+  <path d="M180 250L180 200L340 200L340 120" fill="none" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#inherit)"/>
+  <path d="M500 250L500 200L340 200" fill="none" stroke="#5F5E5A" stroke-width="1.5"/>
+
+  <g>
+    <rect x="100" y="250" width="160" height="70" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+    <text x="180" y="270" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="500" fill="#26215C">Student</text>
+    <line x1="100" y1="282" x2="260" y2="282" stroke="#534AB7" stroke-width="0.5"/>
+    <text x="112" y="302" font-family="monospace" font-size="11" fill="#26215C">+ sayHello()</text>
+    <text x="112" y="316" font-family="sans-serif" font-size="10" fill="#534AB7" font-style="italic">→ "老师好"</text>
+  </g>
+
+  <g>
+    <rect x="420" y="250" width="160" height="70" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+    <text x="500" y="270" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="500" fill="#4A1B0C">Teacher</text>
+    <line x1="420" y1="282" x2="580" y2="282" stroke="#993C1D" stroke-width="0.5"/>
+    <text x="432" y="302" font-family="monospace" font-size="11" fill="#4A1B0C">+ sayHello()</text>
+    <text x="432" y="316" font-family="sans-serif" font-size="10" fill="#993C1D" font-style="italic">→ "同学们好"</text>
+  </g>
+</svg>
