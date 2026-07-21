@@ -1,19 +1,19 @@
 1.在文件资源管理器空白处右键打开属性
-![469](https://cdn.nlark.com/yuque/0/2025/png/62702379/1763862933456-bfb88808-e19b-4ffa-93c5-981484878df6.png)
+![[Pasted image 20260703173753.png|494]]
 
 2.打开高级系统设置,点击环境变量
-![523](https://cdn.nlark.com/yuque/0/2025/png/62702379/1763898969000-2e329911-e7fa-4030-8db3-66c7572ad52a.png)
+![[Pasted image 20260703173805.png|544]]
 
-![523](https://cdn.nlark.com/yuque/0/2025/png/62702379/1763862967218-16c709c3-2e9b-4c96-b63e-a2ec71b35142.png)
+![[Pasted image 20260703173811.png|376]]
 
 3.在系统变量中新建，配置如下
 
-![516](https://cdn.nlark.com/yuque/0/2025/png/62702379/1763862983511-ee00d257-277f-451b-9108-2db165286e09.png)
+![[Pasted image 20260703173819.png|417]]
 
-![545](https://cdn.nlark.com/yuque/0/2025/png/62702379/1763863155322-b1af64a9-6e12-4b9a-ad79-a5b3d8f6a788.png)
+![[Pasted image 20260703173824.png|428]]
 
 4.在系统变量中找到path，进入之后做如下配置
 
-![546](https://cdn.nlark.com/yuque/0/2025/png/62702379/1763863182331-176ca408-5377-4ee3-b27a-b679455ea93c.png)
+![[Pasted image 20260703173829.png|460]]
 ![[Pasted image 20260426150611.png|499]]
  

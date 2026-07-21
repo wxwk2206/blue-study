@@ -1,0 +1,191 @@
+# 1.是什么
+越权（Broken Access Control）
+应用程序没有正确验证"当前用户是否有权限访问这段数据/执行这个操作"，导致攻击者通过修改请求中的参数（如 ID），就**能看到或操作别人的数据**。
+
+越权漏洞的核心问题在于：应用信任了用户可控制的输入来做授权决定。
+```
+# ⭐ 典型的越权场景
+# 用户A登录后，访问自己的订单：
+GET /api/order/1267  HTTP/1.1
+Cookie: session=用户A的凭证
+
+# 服务器返回了用户A的订单。没问题。
+
+# 用户A把 URL 改成：
+GET /api/order/1268  HTTP/1.1
+Cookie: session=用户A的凭证
+
+# 如果服务器不做权限校验，直接返回了用户B的订单。
+# → 这就是 IDOR（Insecure Direct Object Reference，不安全的直接对象引用）
+```
+
+> [!important]  根本原因
+> 服务器在返回数据前，`只验证了"用户是否登录"（认证），没验证"这个对象是否属于当前用户"（授权）。` 认证（Authentication）≠ 授权（Authorization）：前者证明你是谁，后者决定你能做什么。
+# 2.两大类越权
+
+| 垂直越权（Vertical）    | 水平越权（Horizontal / IDOR） |
+| ----------------- | ----------------------- |
+| 低权限用户做高权限的事       | 同级别用户看别人的数据             |
+| 普通用户访问管理员功能       | 用户A看用户B的订单              |
+| 典型：直接访问 /admin 路径 | 典型：修改 URL 中的 ID         |
+| 修改参数：?role=admin  | 修改参数：?user_id=123→124   |
+| 比喻：路人进了员工通道       | 比喻：你的钥匙开了别人的柜子          |
+| 危害等级：严重           | SRC 最常见                 |
+## IDOR 的三种参数载体
+| 载体          | 示例                                | 出现频率  |
+| ----------- | --------------------------------- | ----- |
+| URL 路径/查询参数 | `/user/123/profile`、`?id=123`     | ★★★★★ |
+| POST Body   | `{"user_id": 123, "amount": 100}` | ★★★★  |
+| 请求头/Cookie  | `X-User-ID: 123`、`role=user`      | ★★★   |
+# 3.垂直越权的 4 种攻击手法
+## 3.1未受保护的管理页面
+```
+# 最简单的越权——直接访问
+https://target.com/admin              # 管理后台
+https://target.com/admin/users        # 用户管理
+https://target.com/manager/dashboard  # 主管面板
+
+# 发现方式：
+# 1. 查看 robots.txt（网站主动暴露）
+# 2. JS 源码中搜索 admin、manager、dashboard
+# 3. 字典爆破（dirmap、dirsearch）
+```
+## 3.2参数控制角色
+```
+# ⭐ 经典：通过参数切换角色
+# 登录时服务器校验了角色，但存在可控参数
+POST /login HTTP/1.1
+username=normal_user&password=xxx&role=admin   # ← 试试加这个
+
+# 或 Cookie 中控制
+Cookie: session=xxx; role=user   →  改成 role=admin
+
+# 或 JSON 响应中修改
+# 服务器返回 {"role": "user"} → 拦截后改成 {"role": "admin"}
+```
+## 3.3URL 路径绕过
+```
+# ⭐ 平台层配置了访问控制规则，但可被绕过
+# 规则：DENY POST /admin/deleteUser（禁止普通用户）
+# 绕过1：用 X-Original-URL 头覆盖
+POST / HTTP/1.1
+X-Original-URL: /admin/deleteUser
+
+# 绕过2：大小写（/ADMIN/deleteUser）
+# 绕过3：加后缀（/admin/deleteUser;.js）
+# 绕过4：加斜杠（/admin/deleteUser/）
+
+# 绕过5：换 HTTP 方法
+# POST 被禁，试试 GET
+```
+## 3.4多步骤流程中漏掉验证
+```
+# 修改邮箱的3步流程：
+# 第1步 GET    /account/edit     → ✅ 有权限验证
+# 第2步 POST   /account/verify   → ✅ 有权限验证
+# 第3步 POST   /account/confirm  → ❌ 忘了加！
+
+# ⭐ 攻击者直接跳到第3步：
+POST /account/confirm HTTP/1.1
+email=attacker@evil.com
+# → 邮箱被改，完全绕过前两步的验证
+```
+
+# 4.水平越权（IDOR）攻击实战
+```
+# ⭐ 场景1：遍历订单ID
+GET /api/order/1001 → 自己的订单
+GET /api/order/1002 → 别人的订单！（IDOR）
+# Burp Intruder 批量跑：1000-2000
+
+# ⭐ 场景2：遍历用户ID
+GET /api/user/42/profile     → 自己的资料
+GET /api/user/43/profile     → 别人的手机号、邮箱！
+GET /api/user/44/addresses   → 别人的收货地址！
+
+# ⭐ 场景3：POST Body 中的ID
+POST /api/transfer
+{"from_account": 12345, "to_account": 67890, "amount": 100}
+# 改 from_account → 用别人的账户转账
+```
+ **IDOR 不止是看数据——也能写！**
+IDOR 不只能读别人数据，遇到 PUT/DELETE 操作还能修改、删除别人的资源。
+例如：DELETE /api/order/1002 → 把别人的订单删了。
+发现的 IDOR 要立刻测试**增删改查**四种操作。
+# 5.真实 SRC 高危案例
+```
+🔴 严重：水平越权修改他人密码
+某电商网站修改密码接口：POST /api/reset_password
+参数：{"user_id": 当前用户ID, "new_password": "xxx"}
+没有验证 user_id 是否属于当前登录用户。
+攻击者遍历 user_id，批量重置所有用户密码。
+SRC 评级：严重（全站账号接管）
+
+🟠 高危：垂直越权获取管理员权限
+某企业后台，普通员工修改 Cookie 中的 role=staff 为 role=admin。
+服务器直接读取 Cookie 角色来做授权——攻击者瞬间获得管理员权限。
+SRC 评级：高危
+
+🟠 高危：未授权访问 API 导出全量数据
+GET /api/export_all_users 接口没有登录检查。
+任何人直接访问即可导出全部用户信息（姓名+手机+身份证）。
+SRC 评级：高危（信息泄露 + 直接访问）
+
+🟡 中危：越权查看他人收货地址
+遍历 /api/address?user_id=X，获取大量用户的姓名、电话、地址。
+SRC 评级：中危
+
+```
+# 6.怎么挖？—— 越权检测六步法
+**1.找"对象ID"出现在请求中的地方**
+重点关注：URL 中的 id=、user_id=、order_id=。
+POST Body 里的 JSON 字段如 "user_id"、"account_id"。
+请求头中的 X-User-ID、X-Account-ID。
+
+**2.创建两个测试账号**
+账号A（你自己的）、账号B（新建一个）。两个不同身份才能对比。
+
+**3.用账号A抓包 → 改用账号B的 ID**
+Burp 抓账号A的请求，将 ID 换成账号B的 ID，重放。
+
+**4.看返回内容是否属于账号B**
+如果返回了账号B的数据 → 水平越权确认。
+注意：只"弹回登录页"不算——要看具体响应内容。
+
+**5.用 Burp Intruder 批量遍历**
+对 ID 参数标记位置，设置 Payload 为 1-1000，批量发送。
+按响应长度排序——异常长度的很可能就是越权成功。
+
+**6.测试"无登录"直接访问**
+清除所有 Cookie/Token，直接访问需要登录的 API。
+如果能拿到数据 → 未授权访问（最严重）。
+
+用 Burp Intruder 批量检测 IDOR
+```
+# 步骤（假设检测 /api/user/ID/profile）：
+# 1. 用账号A登录，访问自己的资料 → /api/user/10/profile
+# 2. Burp 抓包，右键 → Send to Intruder
+# 3. 在 Intruder → Positions，把 ID 部分标记为变量：
+#    GET /api/user/§10§/profile
+# 4. Payloads → Numbers → 1 to 500, step 1
+# 5. Start Attack，按响应长度排序
+# 6. 关注那些响应内容不同（有数据返回）的请求
+#    → 手动打开检查是否确实是他人数据
+
+# ⭐ 过滤技巧：
+# 在 Intruder Results 中，添加 Grep - Extract 规则
+# 提取返回中的关键字段（如 username、email）
+# → 一目了然看到不同用户的数据
+```
+# 7.防御方案
+| 防御方案 | 原理 | 优先级 |
+| ---- | ---- | ---- |
+| 服务端对象级权限校验 | 每次请求验证"当前用户是否有权访问此对象"，不依赖客户端传参 | 🔴 必需 |
+| 默认拒绝 + 显式授权 | 除非资源明确授权，否则默认拒绝；新功能必须先声明权限 | 🔴 必需 |
+| 使用间接引用 | 不暴露真实 ID（如数据库主键），使用 Session 级别的映射表 | 🟡 推荐 |
+| 不靠客户端参数做授权 | 角色/权限信息存服务端 Session，不依赖 Cookie/Query String 中的角色字段 | 🔴 必需 |
+| API 网关统一鉴权 | 在网关层统一拦截和鉴权，避免每个接口各自为政 | 🟡 推荐 |
+
+> [!important]  最简单的防御思路
+> `if (resource.owner_id != current_user.id) { return 403; }`
+在每一个涉及具体用户数据的接口中加上这行判断。虽然朴素，但能消灭 90% 的 IDOR。
