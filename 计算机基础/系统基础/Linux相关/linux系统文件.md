@@ -5,6 +5,7 @@ boot linux启动相关软件
 dev设备文件
 
 **<font style="color:#DF2A3F;">etc系统配置文件</font>**
+`/etc/shadow`：**真正保存用户加密后的密码、密码有效期策略**
 
 <font style="color:#DF2A3F;">home用户私人目录>类似windows中我的文档</font>
 
