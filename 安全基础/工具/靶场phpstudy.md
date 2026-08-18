@@ -1,7 +1,7 @@
 靶场放入phpstudy的D:\software\phpstudy\phpstudy_pro\WWW\目录下
-![[Pasted image 20260811142003.png|581]]
+![Pasted image 20260811142003](../../PNG/Pasted%20image%2020260811142003.png)
 php中启动apache和mysql
-![[Pasted image 20260811151734.png|502]]
+![Pasted image 20260811151734](../../PNG/Pasted%20image%2020260811151734.png)
 注意：电脑中本来就有启动MySQL服务的需要关闭原本的MySQL服务，在系统的服务中
 
 ## 1.sqli-labs
@@ -21,10 +21,10 @@ $dbname1 = "challenges";
 
 ?>
 ```
-![[Pasted image 20260811150829.png|633]]
+![Pasted image 20260811150829](../../PNG/Pasted%20image%2020260811150829.png)
 
 配置一个网站，然后访问http://sqli-labs:8011就可以正常使用了
-![[Pasted image 20260811150925.png|549]]
+![Pasted image 20260811150925](../../PNG/Pasted%20image%2020260811150925.png)
 
 ## 2.pikachu
 D:\software\phpstudy\phpstudy_pro\WWW\pikachu\inc中修改config.inc.php配置
@@ -46,7 +46,7 @@ define('DBPORT', '3306');//将3306修改为mysql的连接端口，默认tcp3306
 ?>
 ```
 访问http://127.0.0.1/pikachu/install.php，点击安装/初始化就成功了
-![[Pasted image 20260811153709.png|620]]
+![Pasted image 20260811153709](../../PNG/Pasted%20image%2020260811153709.png)
 ## 3.upload
 加一个域名或者访问127.0.0.1都行
-![[Pasted image 20260811153854.png|593]]
+![Pasted image 20260811153854](../../PNG/Pasted%20image%2020260811153854.png)

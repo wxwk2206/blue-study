@@ -3,12 +3,12 @@
 
        chmod a+x TeamServerImage
 
-![[Pasted image 20260703173653.png]]
+![Pasted image 20260703173653](../../PNG/Pasted%20image%2020260703173653.png)
 
 sudo ./teamserver    （IP）（密码）
-![[Pasted image 20260703173704.png]]
+![Pasted image 20260703173704](../../PNG/Pasted%20image%2020260703173704.png)
 
 ## Client端
 启动client端，填写IP，密码
-![[Pasted image 20260703173708.png]]
+![Pasted image 20260703173708](../../PNG/Pasted%20image%2020260703173708.png)
 

