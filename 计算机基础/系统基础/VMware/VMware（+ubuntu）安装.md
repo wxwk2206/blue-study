@@ -7,10 +7,10 @@
 <font style="color:rgb(68, 68, 68);">VMware官网虚拟机下载页：</font>[<font style="color:rgb(51, 153, 255);">Desktop Hypervisor Solutions | VMware</font>](https://www.vmware.com/products/desktop-hypervisor/workstation-and-fusion)
 
 2.安装VMware
-![[Pasted image 20260703174108.png]]
-![[Pasted image 20260703174112.png]]
-![[Pasted image 20260703174115.png]]
-![[Pasted image 20260703174118.png]]
+![[Pasted image 20260703174108.png|603]]
+![[Pasted image 20260703174112.png|604]]
+![[Pasted image 20260703174115.png|603]]
+![[Pasted image 20260703174118.png|604]]
 
 3.百度搜索VMware17最新密钥永久
 ![[Pasted image 20260703174121.png]]
@@ -19,11 +19,13 @@
 
 
 5.以管理员身份运行应用，创建虚拟机
-![[Pasted image 20260703174131.png]]
+![[Pasted image 20260703174131.png|623]]
 
 6.配置步骤如下所示
-![[Pasted image 20260703174134.png]]
-![[Pasted image 20260703174139.png]]
+![[Pasted image 20260703174134.png|643]]
+
+![[Pasted image 20260703174139.png|623]]
+
 ![[Pasted image 20260703174142.png]]
 ![[Pasted image 20260703174149.png]]
 
