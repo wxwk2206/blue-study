@@ -28,7 +28,7 @@ $dbname1 = "challenges";
 
 ## 2.pikachu
 D:\software\phpstudy\phpstudy_pro\WWW\pikachu\inc中修改config.inc.php配置
-```
+```php
 <?php
 //全局session_start
 session_start();
@@ -44,7 +44,6 @@ define('DBNAME', 'pikachu');//自定义，建议不修改
 define('DBPORT', '3306');//将3306修改为mysql的连接端口，默认tcp3306
 
 ?>
-
 ```
 访问http://127.0.0.1/pikachu/install.php，点击安装/初始化就成功了
 ![[Pasted image 20260811153709.png|620]]
