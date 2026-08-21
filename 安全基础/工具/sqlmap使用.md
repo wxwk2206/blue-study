@@ -5,14 +5,9 @@
 
 ## 1. sqlmap 是什么
 
-> [!abstract] 概括
-> sqlmap 是一款开源的自动化 SQL 注入检测与利用工具，能自动发现注入点、识别数据库类型、并拖库/提权。
+sqlmap 是一款开源的自动化 SQL 注入检测与利用工具，能自动发现注入点、识别数据库类型、并拖库/提权。
 
-> [!note] 比喻
-> 把网站登录接口想象成邮局柜台：你递一张写著「用户名 + 暗号」的纸条进去，正常暗号是「密码」。注入攻击就是在这张纸条里夹带「伪造成暗号的指令」，让柜员（数据库）把不该说的秘密也念出来。sqlmap 就是一个「自动写纸条 + 自动读回执 + 自动判断柜员有没有上当」的流水线工人。
-
-> [!abstract] 细节
-> 它支持 MySQL、PostgreSQL、MSSQL、Oracle、SQLite 等几乎所有主流数据库，覆盖 GET/POST/Cookie/HTTP 头等注入入口，并提供 tamper 脚本绕过 WAF、OS 级命令执行、文件读写等高级能力。
+它支持 MySQL、PostgreSQL、MSSQL、Oracle、SQLite 等几乎所有主流数据库，覆盖 GET/POST/Cookie/HTTP 头等注入入口，并提供 tamper 脚本绕过 WAF、OS 级命令执行、文件读写等高级能力。
 
 ---
 

